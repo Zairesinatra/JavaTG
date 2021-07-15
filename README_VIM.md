@@ -129,6 +129,12 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 :CocInstall coc-snippets
 ```
 
+- asyncrun
+
+```zsh
+Plug 'skywind3000/asyncrun.vim'
+```
+
 ------
 
 ## BUG排除：
@@ -174,6 +180,9 @@ Plug 'honza/vim-snippets'
 " nerdtree
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
+
+" 控制台asyncrun.
+Plug 'skywind3000/asyncrun.vim'
 call plug#end()
 
 " --------------- morhetz/gruvbox ---------------
@@ -219,6 +228,33 @@ let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '✭'
 " 开启/关闭nerdtree快捷键
 nnoremap <F1> :NERDTreeToggle<CR>
+" 配置asyncrun.vim
+map <F5> :call Runcode()<CR>
+func! Runcode()
+     exec "w"
+       if &filetype == 'python'
+           if search("@profile")
+               exec "AsyncRun kernprof -l -v %"
+               exec "copen"
+               exec "wincmd p"
+           elseif search("set_trace()")
+               exec "!python3 %"
+           else
+               exec "AsyncRun -raw python3 %"
+               exec "copen"
+               exec "wincmd p"
+           endif
+      elseif &filetype == 'c'
+          exec "AsyncRun! gcc % -o %<; time ./%<"
+      elseif &filetype == 'cpp'
+          exec "AsyncRun! g++ -std=c++11 % -o %<; time ./%<"
+          exec "copen"
+          exec "wincmd p"
+      elseif &filetype == 'java'
+          exec "AsyncRun! javac %; time java %<"
+		  cope 8 "启动 quickfix 窗口, 设置窗口大小为8
+      endif
+endfunc
 ```
 
 ------
@@ -228,5 +264,8 @@ nnoremap <F1> :NERDTreeToggle<CR>
 **这里说几点：**
 
 - Mac M1 芯片不支持 xournal plus plus version 1.0.20，而 @1.0.19可以使用
-- NVM 在 mac m1 芯片又开始不支持的搞事了。现已卸载 NVM 重新从 HomeBrew 下载 Node -v15
+- NVM 在 mac m1 芯片不支持前 node 版本。现已卸载 NVM 重新从 HomeBrew 下载 Node -v15（已解决此问题-改架构）
+- `:copen` #打开quickfix窗口
+- `:ccolse` #关闭quickfix窗口
+- NVIM快捷键：PSVM\sout\copen\close\sout
 
